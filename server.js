@@ -3,7 +3,10 @@ const app = express();
 const ejs = require('ejs');
 const path = require('path');
 const expressLayout = require("express-ejs-layouts");
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3300;
+
+// Assets
+app.use(express.static('public'));
 
 app.get("/", (req, res) => {
     res.render('home');

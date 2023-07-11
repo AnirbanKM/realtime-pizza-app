@@ -41,3 +41,33 @@ section.hero {
         color: $pure;
     }
 }
+
+.btn-primary {
+    background-color: $primary !important;
+    transition: $smooth;
+
+    &:hover {
+        background-color: $primary-hover !important;
+    }
+}
+
+section.cart {
+    background: $secondary;
+
+    .amount {
+        color: $primary;
+    }
+}
+
+section.login {
+    background-color: $secondary;
+    min-height: calc(100vh - 86px);
+
+    a {
+        color: $primary;
+
+        &:hover {
+            color: $primary-hover;
+        }
+    }
+}

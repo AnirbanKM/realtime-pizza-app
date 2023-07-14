@@ -34,7 +34,7 @@ function cartController() {
 
             console.log(cart.items);
             return res.json({ totalQty: req.session.cart.totalQty });
-        }
+        },
     }
 }
 

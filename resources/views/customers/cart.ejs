@@ -42,23 +42,27 @@
                     <span class="amount text-2xl font-bold ml-2">$<%= session.cart.totalPrice %></span>
                 </div>
 
-                <div>
-                    <form action="" class="mt-12">
-                        <input type="text" class="border border-gray-400 p-2 w-1/2 mb-4" placeholder="Phone Number" />
-                        <input type="text" class="border border-gray-400 p-2 w-1/2" placeholder="Address" />
-                        <div>
-                            <button type="submit" class="btn-primary px-6 py-2 rounded-full text-white font-bold mt-6">
-                                Order Now
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <a href=""
-                    class="inline-block cursor-ponter btn-primary px-6 py-2 rounded-full text-white font-bold mt-6">
-                    Login to contine
-                </a>
-
+                <% if(user){ %>
+                    <div>
+                        <form action="/orders" class="mt-12" method="POST">
+                            <input type="text" class="border border-gray-400 p-2 w-1/2 mb-4" name="phone"
+                                placeholder="Phone Number" name="number" />
+                            <input type="text" class="border border-gray-400 p-2 w-1/2" name="address"
+                                placeholder="Address" name="address" />
+                            <div>
+                                <button type="submit"
+                                    class="btn-primary px-6 py-2 rounded-full text-white font-bold mt-6">
+                                    Order Now
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <% }else{ %>
+                        <a href=""
+                            class="inline-block cursor-ponter btn-primary px-6 py-2 rounded-full text-white font-bold mt-6">
+                            Login to contine
+                        </a>
+                        <% } %>
             </div>
 
         </div>

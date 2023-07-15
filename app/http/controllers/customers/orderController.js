@@ -22,6 +22,11 @@ function orderController() {
 
             order.save().then((result) => {
                 delete req.session.cart;
+
+                // Emit
+                const eventEmitter = req.app.get('eventEmitter');
+                eventEmitter.emit('orderPlaced', { result });
+
                 req.flash('success', 'Order placed successfully');
                 return res.redirect('/customer/orders');
             }).catch((err) => {
@@ -37,6 +42,16 @@ function orderController() {
             ).sort({ 'createdAt': -1 });
 
             res.render('customers/orders', { orders: orders, moment: moment });
+        },
+
+        show: async (req, res) => {
+            const order = await Order.findById(req.params.id);
+            // if (req.user._id.toString() === order.customerId.toString()) {
+            //     res.render('customers/singleOrder', { order: order });
+            // } else {
+            //    res.render('/');
+            // }
+            res.render('customers/singleOrder', { order });
         }
     }
 }

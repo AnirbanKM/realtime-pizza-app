@@ -2,6 +2,9 @@ import axios from 'axios';
 import Noty from 'noty';
 import moment from 'moment';
 
+// Socket
+let socket = io();
+
 let addToCart = document.querySelectorAll('.add-to-cart');
 let cartCounter = document.querySelector("#cartCounter");
 
@@ -83,8 +86,8 @@ function generateMarkup(orders) {
                         <form action="/admin/order/status" method="post">
                             <input type="hidden" name="orderID" value="${order._id}">
                             <select name="status" onchange="this.form.submit()" class="block apprearance-none w-full bg-white 
-                            border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight 
-                            focus:outline-none focus:shadow-outline">
+                                border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight 
+                                focus:outline-none focus:shadow-outline">
                         
                             <option value="order_placed" ${order.status === 'order_placed' ? 'selected' : ''} >
                                 Placed
@@ -117,3 +120,91 @@ function generateMarkup(orders) {
         `;
     }).join('');
 }
+
+socket.on('orderPlaced', (order) => {
+    console.log('From Admin side', order);
+    new Noty({
+        type: 'success',
+        text: "New order!!!",
+        timeout: 1000,
+        progressBar: false
+    }).show();
+
+    axios.get('/admin/orders', {
+        headers: {
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    }).then(res => {
+        orders = res.data;
+        markup = generateMarkup(orders);
+        orderTableBody.innerHTML = markup;
+    }).catch(err => {
+        console.log(err);
+    })
+});
+
+
+// *** Change order status
+let statuses = document.querySelectorAll(".status_line");
+let hiddenInput = document.querySelector("#hiddenInput");
+let order = hiddenInput ? hiddenInput.value : null;
+order = JSON.parse(order);
+let time = document.createElement('small');
+
+function updateStatus(order) {
+    statuses.forEach((status) => {
+        status.classList.remove('step-completed');
+        status.classList.remove('current');
+    });
+
+    let stepCompleted = true;
+    statuses.forEach((status) => {
+        let dataProp = status.dataset.status;
+        if (stepCompleted) {
+            status.classList.add('step-completed');
+        }
+
+        if (dataProp === order.status) {
+            stepCompleted = false;
+            time.innerText = moment(order.updatedAt).format('hh:mm A');
+            status.appendChild(time);
+            if (status.nextElementSibling) {
+                status.nextElementSibling.classList.add('current');
+            }
+        }
+    });
+}
+
+updateStatus(order);
+
+
+
+// Join
+if (order) {
+    socket.emit('join', `order_${order._id}`);
+    // order_64b1025a0a484ad5f3f6e571
+}
+
+let adminAreaPath = window.location.pathname;
+if (adminAreaPath.includes('admin')) {
+    socket.emit('join', 'adminRoom');
+}
+
+socket.on('orderupdatedController', (data) => {
+    let updatedOrder = { ...order };
+    updatedOrder.updatedAt = moment().format();
+    updatedOrder.status = data.status;
+
+    console.log(order);
+
+    updateStatus(updatedOrder);
+
+    new Noty({
+        type: 'success',
+        text: "Order updated successfully",
+        timeout: 1000,
+        progressBar: false
+    }).show();
+});
+
+// 2:17:48
